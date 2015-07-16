@@ -6,6 +6,7 @@
 require('/shared/js/component_utils.js');
 require('/shared/js/event_safety.js');
 require('/shared/elements/gaia_progress/script.js');
+require('/shared/elements/gaia_pin_card/script.js');
 require('/shared/test/unit/mocks/mock_l10n.js');
 require('/shared/test/unit/mocks/mock_lazy_loader.js');
 require('/shared/test/unit/mocks/mock_service.js');
@@ -13,6 +14,7 @@ require('/shared/test/unit/mocks/mock_promise.js');
 requireApp('system/test/unit/mock_app_window.js');
 requireApp('system/test/unit/mock_popup_window.js');
 requireApp('system/test/unit/mock_modal_dialog.js');
+requireApp('system/test/unit/mock_settings_helper.js');
 
 var MockBookmarksDatabase = {
   get: function(resolve, reject) {
@@ -22,7 +24,7 @@ var MockBookmarksDatabase = {
 
 var mocksForAppChrome = new MocksHelper([
   'AppWindow', 'ModalDialog', 'PopupWindow', 'BookmarksDatabase',
-  'Service', 'LazyLoader'
+  'Service', 'LazyLoader', 'SettingsHelper'
 ]).init();
 
 suite('system/AppChrome', function() {
@@ -142,10 +144,12 @@ suite('system/AppChrome', function() {
     });
 
     test('app location is changed', function() {
+      this.sinon.stub(chrome, 'hidePinDialogCard');
       var stubHandleLocationChange =
         this.sinon.stub(chrome, 'handleLocationChange');
       chrome.handleEvent({ type: '_locationchange' });
       assert.isTrue(stubHandleLocationChange.called);
+      assert.isTrue(chrome.hidePinDialogCard.called);
     });
 
     test('app location is changed - private browser landing page', function() {
@@ -154,10 +158,10 @@ suite('system/AppChrome', function() {
       this.sinon.stub(app, 'isPrivateBrowser').returns(true);
 
       var chrome = new AppChrome(app);
+      this.sinon.stub(chrome, 'hidePinDialogCard');
       chrome.handleEvent({ type: '_locationchange' });
       assert.equal(chrome.title.dataset.l10nId, 'search-or-enter-address');
-
-
+      assert.isTrue(chrome.hidePinDialogCard.called);
     });
 
     test('add bookmark', function() {
@@ -360,6 +364,58 @@ suite('system/AppChrome', function() {
     });
   });
 
+  suite('setPinDialogCard', function() {
+    setup(function() {
+      this.sinon.stub(chrome, 'setOrigin');
+      chrome.pinDialog.classList.add('hidden');
+      chrome.app.getScreenshot = this.sinon.stub();
+      chrome.setPinDialogCard();
+    });
+
+    test('sets the origin', function() {
+      assert.isTrue(chrome.setOrigin.called);
+    });
+
+    test('sets the background as screenshot', function() {
+      assert.isTrue(chrome.app.getScreenshot.called);
+    });
+
+    test('appends the card to the cardContainer', function() {
+      var container = chrome.pinCardContainer.innerHTML;
+      assert.isTrue(container.contains('gaia-pin-card'));
+    });
+
+     test('shows the pinDialog', function() {
+      assert.isFalse(chrome.pinDialog.classList.contains('hidden'));
+    });
+  });
+
+  suite('setOrigin', function() {
+    var DOMAIN, SUBDOMAIN;
+
+    setup(function() {
+      DOMAIN = 'firefox.org';
+      SUBDOMAIN = 'test.';
+    });
+
+    test('no subdomains', function() {
+      chrome._currentOrigin = 'http://' + DOMAIN;
+      chrome.setOrigin();
+      var tld = chrome.originElement.querySelector('.tld');
+      assert.equal(tld.textContent, DOMAIN);
+      chrome.originElement.removeChild(tld);
+      assert.equal(chrome.originElement.textContent, '');
+    });
+
+    test('with subdomains', function() {
+      chrome._currentOrigin = 'http://' + SUBDOMAIN + DOMAIN;
+      chrome.setOrigin();
+      var tld = chrome.originElement.querySelector('.tld');
+      assert.equal(tld.textContent, DOMAIN);
+      chrome.originElement.removeChild(tld);
+      assert.equal(chrome.originElement.textContent, SUBDOMAIN);
+    });
+  });
 
   suite('URLBar', function() {
     test('click', function() {
@@ -772,6 +828,7 @@ suite('system/AppChrome', function() {
       chrome = new AppChrome(app);
       this.sinon.stub(app, 'publish');
       this.sinon.stub(app, 'isActive').returns(true);
+      this.sinon.stub(chrome, 'isMaximized').returns(false);
 
       for (var i = 0; i < 10; i++) {
         chrome.handleEvent({ type: 'scroll' });
@@ -788,6 +845,12 @@ suite('system/AppChrome', function() {
     test('should publish when the element transition ends', function() {
       chrome.element.dispatchEvent(new CustomEvent('transitionend'));
       sinon.assert.calledOnce(app.publish.withArgs('chromecollapsed'));
+    });
+
+    test('publishes chromeexpanded when transition ends', function() {
+      chrome.isMaximized.returns(true);
+      chrome.element.dispatchEvent(new CustomEvent('transitionend'));
+      sinon.assert.calledOnce(app.publish.withArgs('chromeexpanded'));
     });
 
     test('should only publish once', function() {
@@ -866,6 +929,40 @@ suite('system/AppChrome', function() {
       assert.equal(origSiteIcon, newSiteIcon);
       assert.equal(origClassName, newClassName);
       assert.ok(!combinedChrome.app.getSiteIconUrl.called);
+    });
+
+    test('click and pref disabled', function() {
+      this.sinon.stub(chrome, 'setPinDialogCard');
+      this.sinon.stub(chrome.app, 'isBrowser').returns(true);
+      chrome.handleClickEvent({
+        target: chrome.siteIcon,
+        stopImmediatePropagation: function() {}
+      });
+      assert.isFalse(chrome.setPinDialogCard.called);
+    });
+
+    test('click and pref enabled', function() {
+      chrome.pinningPref.set(true);
+      this.sinon.stub(chrome, 'setPinDialogCard');
+      this.sinon.stub(chrome.app, 'isBrowser').returns(true);
+      chrome.handleClickEvent({
+        target: chrome.siteIcon,
+        stopImmediatePropagation: function() {}
+      });
+      assert.isTrue(chrome.setPinDialogCard.called);
+      chrome.pinningPref.set(false);
+    });
+
+    test('click, pref enabled but no browser', function() {
+      chrome.pinningPref.set(true);
+      this.sinon.stub(chrome, 'setPinDialogCard');
+      this.sinon.stub(chrome.app, 'isBrowser').returns(false);
+      chrome.handleClickEvent({
+        target: chrome.siteIcon,
+        stopImmediatePropagation: function() {}
+      });
+      assert.isFalse(chrome.setPinDialogCard.called);
+      chrome.pinningPref.set(false);
     });
   });
 
