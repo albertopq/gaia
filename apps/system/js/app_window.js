@@ -1117,6 +1117,9 @@
 
   AppWindow.prototype._handle_mozbrowserlocationchange =
     function aw__handle_mozbrowserlocationchange(evt) {
+      if (this.config.url === evt.detail) {
+        return;
+      }
       this.favicons = {};
       this.webManifestURL = null;
       this.webManifest = null;
@@ -1133,7 +1136,6 @@
 
   AppWindow.prototype._handle_mozbrowsericonchange =
     function aw__handle_mozbrowsericonchange(evt) {
-
       var href = evt.detail.href;
       var sizes = evt.detail.sizes;
 

@@ -2097,6 +2097,35 @@ suite('system/AppWindow', function() {
       app1.config.url = url;
     });
 
+    test('Locationchange event to same URL', function() {
+      var app1 = new AppWindow(fakeAppConfig1);
+      var url = app1.config.url;
+
+      app1.handleEvent({
+        type: 'mozbrowserlocationchange',
+        detail: 'http://fakeURL.changed'
+      });
+
+      app1.handleEvent({
+        type: 'mozbrowsericonchange',
+        detail: {
+          href: 'http://fakeURL.favicon',
+          sizes: 60
+        }
+      });
+      var favicons = app1.favicons;
+      assert.equal(Object.keys(favicons).length, 1);
+
+      this.sinon.stub(app1, 'publish');
+      app1.handleEvent({
+        type: 'mozbrowserlocationchange',
+        detail: 'http://fakeURL.changed'
+      });
+      assert.deepEqual(app1.favicons, favicons);
+      assert.isFalse(app1.publish.called);
+      app1.config.url = url;
+    });
+
     test('Locationchange event resets name and title', function() {
       var app1 = new AppWindow(fakeWrapperConfig);
 
