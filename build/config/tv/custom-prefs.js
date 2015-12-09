@@ -3,11 +3,11 @@ user_pref('devtools.responsiveUI.customWidth', 1366);
 user_pref('devtools.responsiveUI.customHeight', 768);
 user_pref('devtools.responsiveUI.currentPreset', 'custom');
 user_pref('b2g.system_startup_url',
-          'app://smart-system.gaiamobile.org/index.html');
+          'app://system.gaiamobile.org/index_tv.html');
 user_pref('b2g.system_manifest_url',
-          'app://smart-system.gaiamobile.org/manifest.webapp');
+          'app://system.gaiamobile.org/manifest.webapp');
 user_pref('b2g.neterror.url',
-          'app://smart-system.gaiamobile.org/net_error.html');
+          'app://system.gaiamobile.org/net_error.html');
 user_pref('dom.meta-viewport.enabled', false);
 user_pref('dom.presentation.enabled', true);
 user_pref('devtools.useragent.device_type', 'TV');

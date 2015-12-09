@@ -81,6 +81,7 @@ tv_apps/fling-player/bower_components/**
 tv_apps/notification-sender/bower_components/**
 tv_apps/smart-home/bower_components/**
 tv_apps/smart-settings/bower_components/**
+apps/system/bower_components/**
 tv_apps/smart-system/bower_components/**
 tv_apps/notification/bower_components/**
 tv_apps/fling-tutorial/bower_components/**
