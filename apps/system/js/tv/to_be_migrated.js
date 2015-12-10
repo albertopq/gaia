@@ -16,7 +16,6 @@ window.TO_BE_MIGRATED = [
   'app_window.js',
   'app_window_factory.js',
   'app_window_manager.js',
-  'applications.js',
   'attention_toaster.js',
   'attention_window.js',
   'attention_window_manager.js',
