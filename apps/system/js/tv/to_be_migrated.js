@@ -1,85 +1,89 @@
 'use strict';
 
+// List of files that need to be migrated to the System app.
+// The number next to each file is the number of commits that differ
+// from the fork.
+
 window.TO_BE_MIGRATED = [
-  'accessibility.js',
-  'action_menu.js',
-  'activities.js',
-  'activity_window.js',
-  'activity_window_manager.js',
-  'airplane_mode.js',
-  'app_authentication_dialog.js',
-  'app_chrome.js',
-  'app_install_manager.js',
-  'app_modal_dialog.js',
-  'app_transition_controller.js',
-  'app_usage_metrics.js',
-  'app_window.js',
-  'app_window_factory.js',
-  'app_window_manager.js',
-  'attention_toaster.js',
-  'attention_window.js',
-  'attention_window_manager.js',
-  'audio_channel_policy.js',
-  'audio_channel_service.js',
-  'base_module.js',
-  'base_ui.js',
-  'bluetooth_transfer.js',
-  'bootstrap.js',
-  'browser.js',
-  'browser_config_helper.js',
-  'browser_context_menu.js',
-  'browser_frame.js',
-  'browser_key_event_manager.js',
-  'browser_mixin.js',
-  'captive_portal.js',
-  'child_window_factory.js',
-  'core.js',
-  'crash_reporter.js',
-  'developer_hud',
-  'logshake',
-  'entry_sheet.js',
-  'external_storage_monitor.js',
-  'ftu_launcher.js',
-  'ftu_ping.js',
-  'fx_accounts_manager.js',
-  'fx_accounts_u_i.js',
-  'fxa_dialog.js',
-  'hardware_buttons.js',
-  'home_gesture.js',
-  'homescreen_launcher.js',
-  'homescreen_window.js',
-  'homescreen_window_manager.js',
-  'identity.js',
-  'ime_menu.js',
-  'input_layouts.js',
-  'keyboard_manager.js',
-  'layout_manager.js',
-  'media_recording.js',
-  'modal_dialog.js',
-  'net_error.js',
-  'orientation_manager.js',
-  'permission_manager.js',
-  'popup_window.js',
-  'screen_manager.js',
-  'screenshot.js',
-  'service.js',
-  'sleep_menu.js',
-  'sound_manager.js',
-  'stack_manager.js',
-  'suspending_app_priority_manager.js',
-  'sync_manager.js',
-  'sync_state_machine.js',
-  'system_banner.js',
-  'system_dialog.js',
-  'system_dialog_manager.js',
-  'updatable.js',
-  'update_manager.js',
-  'usb_storage.js',
-  'spin_date_picker',
-  'value_picker',
-  'value_selector',
-  'visibility_manager.js',
-  'wallpaper_manager.js',
-  'wifi.js',
-  'wrapper_factory.js'
+  'attention_toaster.js', // 3
+  'app_window_manager.js ', //16
+  'audio_channel_policy.js', // 2
+  'bootstrap.js ', //15
+  'attention_window_manager.js', // 6
+  'app_install_manager.js ', //13
+  'app_chrome.js', // 8
+  'accessibility.js', // 5
+  'app_usage_metrics.js', // 5
+  'action_menu.js', // 7
+  'devtools/logshake.js', // 3
+  'audio_channel_service.js', // 5
+  'browser_context_menu.js ', //28
+  'attention_window.js', // 4
+  'core.js', // 2
+  'crash_reporter.js', // 8
+  'bluetooth_transfer.js', // 7
+  'base_ui.js', // 4
+  'airplane_mode.js', // 4
+  'app_modal_dialog.js ', //16
+  'app_transition_controller.js', // 9
+  'activity_window.js', // 7
+  'browser_mixin.js', // 4
+  'activities.js', // 7
+  'app_window.js ', //16
+  'activity_window_manager.js', // 2
+  'browser_frame.js', // 5
+  'app_window_factory.js ', //10
+  'captive_portal.js', // 5
+  'app_authentication_dialog.js', // 8
+  'entry_sheet.js', // 5
+  'base_module.js', // 1
+  'fx_accounts_u_i.js', // 1
+  'browser.js', // 3
+  'ftu_ping.js', // 4
+  'child_window_factory.js ', //15
+  'homescreen_launcher.js', // 4
+  'identity.js', // 4
+  'fxa_dialog.js', // 2
+  'sync_manager.js ', //17
+  'hardware_buttons.js', // 4
+  'keyboard_manager.js', // 6
+  'homescreen_window_manager.js ', //15
+  'external_storage_monitor.js', // 4
+  'homescreen_window.js', // 7
+  'input_layouts.js', // 4
+  'home_gesture.js', // 3
+  'layout_manager.js', // 5
+  'ftu_launcher.js', // 4
+  'fx_accounts_manager.js', // 2
+  'devtools/developer_hud.js', // 3
+  'suspending_app_priority_manager.js', // 3
+  'media_recording.js', // 2
+  'browser_key_event_manager.js', // 5
+  'popup_window.js', // 2
+  'ime_menu.js', // 6
+  'modal_dialog.js', // 9
+  'service.js', // 3
+  'permission_manager.js', // 9
+  'sync_state_machine.js', // 2
+  'screen_manager.js', // 5
+  'system_dialog.js', // 4
+  'browser_config_helper.js', // 6
+  'net_error.js', // 2
+  'value_selector/value_selector.js', // 4
+  'sleep_menu.js ', //11
+  'sound_manager.js', // 5
+  'system_dialog_manager.js', // 3
+  'system_banner.js', // 7
+  'screenshot.js', // 3
+  'stack_manager.js', // 2
+  'orientation_manager.js', // 5
+  'wrapper_factory.js', // 5
+  'value_selector/value_picker.js', // 5
+  'usb_storage.js', // 4
+  'value_selector/spin_date_picker.js', // 3
+  'wallpaper_manager.js', // 5
+  'visibility_manager.js', // 3
+  'wifi.js', // 5
+  'update_manager.js', // 7
+  'updatable.js' // 5
 ];
