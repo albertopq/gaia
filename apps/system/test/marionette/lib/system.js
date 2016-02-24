@@ -10,9 +10,10 @@ module.exports = System;
 
 System.URL = 'app://system.gaiamobile.org/manifest.webapp';
 System.Keys = {
-  'enter': '\ue006',
-  'right': '\ue014',
-  'esc': '\ue00c'
+  enter: '\ue006',
+  right: '\ue014',
+  esc: '\ue00c',
+  back: '\ue003'
 };
 System.Selector = Object.freeze({
   screen: '#screen',
@@ -671,5 +672,25 @@ System.prototype = {
     var banner = this.systemBanner;
     banner.tap();
     this.client.helper.waitForElementToDisappear(banner);
+  },
+
+  pressBack: function() {
+    this.client.switchToFrame();
+    this.client.executeScript(function() {
+      window.wrappedJSObject.dispatchEvent(new CustomEvent('back'));
+    });
+  },
+
+  openWindow: function(url, features) {
+    var frame = this.getHomescreenIframe();
+    this.client.switchToFrame(frame);
+    this.client.executeScript(function(url, features) {
+      var win = window.wrappedJSObject;
+      win.open(url, '_blank', Object.keys(features).map(
+        key => encodeURIComponent(key) + '=' +
+          encodeURIComponent(features[key])
+      ).join(','));
+    }, [url, features]);
+    this.client.switchToFrame();
   }
 };

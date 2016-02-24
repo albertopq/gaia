@@ -1,5 +1,5 @@
 'use strict';
-/*global applications, AppWindowManager, AppWindow, AppInstallManager */
+/*global applications, AppWindowManager, AppWindow */
 
 (function(window) {
   /**
@@ -38,8 +38,7 @@
           return acc;
         }, {});
 
-      if ('preview' in features && features.preview === 'true' &&
-          AppInstallManager.isMarketplaceAppActive()) {
+      if ('preview' in features && features.preview === 'true') {
 
         var marketplaceApp = AppWindowManager.getActiveApp();
         marketplaceApp.publish('launchpreviewapp', {
