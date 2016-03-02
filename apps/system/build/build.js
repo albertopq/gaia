@@ -183,12 +183,33 @@ SystemAppBuilder.prototype.copyTvFolder = function(options) {
   shared.filterSharedUsage(utils.getFile(tvNetError));
 };
 
+SystemAppBuilder.prototype.getCustomModules = function(options) {
+  var deviceType = options.GAIA_DEVICE_TYPE;
+  var configPath = [options.GAIA_DIR, 'build', 'config', deviceType].join('/');
+  var stagePath = options.STAGE_APP_DIR;
+  var modulesFile = utils.getFile(configPath, 'custom_modules.json');
+  if (modulesFile.exists()) {
+    var modules = utils.getJSON(modulesFile);
+    var customModulesPath = [stagePath, 'js', 'custom_modules.js'];
+    var customModulesFile = utils.getFile.apply(utils, customModulesPath);
+    var customModulesContent = utils.getFileContent(customModulesFile);
+    utils.writeContent(
+      customModulesFile,
+      customModulesContent.replace(
+        /CustomModules\.SUB_MODULES = \[\];/,
+        'CustomModules.SUB_MODULES = ' + JSON.stringify(modules) + ';'
+      )
+    );
+  }
+};
+
 SystemAppBuilder.prototype.execute = function(options) {
   utils.copyToStage(options);
+  this.getCustomModules(options);
   // TMP until we merge TV and phone system apps
-  if (options.GAIA_DEVICE_TYPE === 'tv') {
-    this.copyTvFolder(options);
-  }
+  // if (options.GAIA_DEVICE_TYPE === 'tv') {
+  //   this.copyTvFolder(options);
+  // }
   this.setOptions(options);
   this.initConfigJsons();
   if (this.distDirPath) {
