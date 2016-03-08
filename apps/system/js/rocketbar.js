@@ -1,5 +1,5 @@
 'use strict';
-/* global eventSafety */
+/* global eventSafety, Sanitizer, LazyLoader */
 /* global Service, SearchWindow, places, Promise, UtilityTray */
 
 (function(exports) {
@@ -21,6 +21,8 @@
     this._port = null; // Inter-app communications port
     this._wasClicked = false; // Remember when transition triggered by a click
     this._pendingMessage = null;
+
+    this.render();
 
     // Get DOM elements
     this.body = document.body;
@@ -66,6 +68,34 @@
         this.focus();
       }
       return true;
+    },
+
+    render: function() {
+      LazyLoader.load('/style/rocketbar/rocketbar.css');
+      var windows = document.getElementById('windows');
+      windows.insertAdjacentHTML('afterend', Sanitizer.escapeHTML`
+        <!-- Rocketbar-->
+        <div id="rocketbar" data-z-index-level="statusbar">
+          <form id="rocketbar-form" class="hidden">
+            <input id="rocketbar-input" type="search" x-inputmode="verbatim"
+              placeholder="Search or enter address"
+              data-l10n-id="search-or-enter-address" value="" />
+            <button type="button" id="rocketbar-clear"
+              data-l10n-id="clear" aria-label="Clear">
+            </button>
+            <button type="button" id="rocketbar-cancel" data-l10n-id="close">
+            </button>
+          </form>
+        </div>
+
+        <!-- Rocketbar Results -->
+        <div id="rocketbar-backdrop" class="hidden"
+             data-z-index-level="rocketbar-backdrop">
+        </div>
+        <div id="rocketbar-results" class="hidden"
+          data-z-index-level="rocketbar-results">
+        </div>
+    `);
     },
 
     /**
