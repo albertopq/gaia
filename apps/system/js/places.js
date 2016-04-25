@@ -22,7 +22,12 @@
   ];
 
   Places.SERVICES = [
-    'clearHistory', 'pinSite', 'getPinnedSites'
+    'clearHistory',
+    'pinSite',
+    'unpinSite',
+    'getPinnedSites',
+    'isPagePinned',
+    'isSitePinned'
   ];
 
   BaseModule.create(Places, {
@@ -369,13 +374,31 @@
       });
     },
 
+    isSitePinned: function(url) {
+      return new Promise((resolve, reject) => {
+        return this.getDb().then(db => {
+          var transaction = db.transaction(this.SITES_STORE, 'readonly');
+          var objectStore = transaction.objectStore(this.SITES_STORE);
+          var request = objectStore.get(url);
+          request.onsuccess = function() {
+            var site = request.result;
+            return resolve(site);
+          };
+          request.onerror = function(e) {
+            console.error(`Error getting the site details: ${e}`);
+            return reject(e);
+          };
+        });
+      });
+    },
+
     /**
      * Is a page currently pinned?
      *
      * @param {String} url The URL of the page to check.
      * @returns {Promise} Promise of a response.
      */
-    isPinned: function(url) {
+    isPagePinned: function(url) {
       return new Promise((resolve, reject) => {
         return this.getDb().then(db => {
           var transaction = db.transaction(this.PAGES_STORE, 'readonly');
@@ -414,6 +437,26 @@
     
           writeRequest.onerror = function() {
             console.error('Error updating site with id ' + siteObject.id);
+            reject();
+          };
+        }).bind(this));
+      }).bind(this));
+    },
+
+    unpinSite: function(id) {
+      return new Promise((function(resolve, reject) {
+        this.getDb().then((function(db) {
+          var transaction = db.transaction(this.SITES_STORE, 'readwrite');
+          var objectStore = transaction.objectStore(this.SITES_STORE);
+          var writeRequest = objectStore.delete(id);
+
+          writeRequest.onsuccess = function() {
+            console.log('Successfully unpinned site with id ', id);
+            resolve();
+          };
+
+          writeRequest.onerror = function() {
+            console.log('Error unpinning site with id ', id);
             reject();
           };
         }).bind(this));

@@ -484,6 +484,7 @@
           .then(() => {
             this.app.debug('pinSite: ' + siteObject.id);
             this.systemBanner.show('site-pinned-to-home-screen');
+            this.pin();
           })
           .catch((error) => {
             console.error('pinSite, Failed to pin site: ' + error);
@@ -499,11 +500,11 @@
       return;
     }
     var siteId = this.getSiteUrl();
-    BookmarksDatabase.remove(siteId)
+    Service.request('Places:unpinSite', siteId)
       .then(() => {
         this.app.debug('unpinSite: ' + siteId);
         this.systemBanner.show('site-unpinned-from-home-screen');
-        // 'removed' listener will call unpin()
+        this.unpin();
       }, (evt) => {
         this.app.debug('unpinSite, unpinning cancelled for: ' + siteId);
       });
@@ -1052,7 +1053,7 @@
         this.containerElement.classList.remove('scrollable');
         this.scrollable.scrollTop = 0;
 
-        Service.request('PinsManager:isPinned', this._currentURL)
+        Service.request('Places:isSitePinned', this._currentURL)
           .then((isPinned) => {
             isPinned ? this.pin() : this.unpin();
           });

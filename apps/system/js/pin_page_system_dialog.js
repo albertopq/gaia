@@ -185,15 +185,15 @@
     siteBadge.icon = data.icon;
     this.siteName.textContent = data.name;
 
-    Service.request('Places:isPinned', data.url)
+    Service.request('Places:isPagePinned', data.url)
       .then((isPinned) => {
         var action = isPinned ? 'unpin-page' : 'pin-page';
         this.pageButtonSpan.setAttribute('data-l10n-id', 'pinning-' + action);
         this.pageButtonIcon.setAttribute('data-icon', action.split('-')[0]);
         this.pinPageButton.dataset.action = action;
       });
-
-    BookmarksDatabase.get(data.url).then((site) => {
+    Service.request('Places:isSitePinned', data.url)
+    .then((site) => {
       var action = site ? 'unpin-site' : 'pin-site';
       if (!site) {
         var scope = Service.query('getScope', data.url);
